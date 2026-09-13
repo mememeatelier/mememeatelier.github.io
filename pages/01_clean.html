@@ -254,14 +254,38 @@
     function shareToX() {
         const text = `「ゆるお片づけ応援ツール」を使って、今日は【${currentPlace}】を片づけました！\n本日の手放し記録：${count}個 🧺✨\n\n今日も天才です！\n#1日1捨て #お片付け`;
         const siteUrl = 'https://mememeatelier.github.io/';
-        const xUrl = `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(siteUrl)}`;
 
-        // Xのアプリ内ブラウザでは同一タブでの遷移時にレイアウト崩れが起きやすいため、
-        // 外部ブラウザで開くようにして表示を安定させる。
-        const popup = window.open(xUrl, '_blank', 'noopener,noreferrer');
-        if (!popup) {
-            window.location.href = xUrl;
+        // Xのアプリ内ブラウザ側で横幅崩れが起きるため、
+        // 共有画面へ遷移せず、OSのネイティブ共有シートを使う。
+        if (navigator.share) {
+            navigator.share({
+                title: 'ゆるお片づけ応援ツール',
+                text,
+                url: siteUrl
+            }).catch(() => {
+                fallbackCopyShareText(text);
+            });
+            return;
         }
+
+        fallbackCopyShareText(text);
+    }
+
+    function fallbackCopyShareText(text) {
+        const shareText = `${text}\n${'https://mememeatelier.github.io/'}`;
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(shareText)
+                .then(() => {
+                    alert('投稿内容をコピーしました。Xアプリで貼り付けて投稿してください。');
+                })
+                .catch(() => {
+                    prompt('投稿内容をコピーしてXに貼り付けてください。', shareText);
+                });
+            return;
+        }
+
+        prompt('投稿内容をコピーしてXに貼り付けてください。', shareText);
     }
 </script>
 
