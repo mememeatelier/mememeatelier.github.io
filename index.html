@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>おむらいすの片づけお助けアプリ</title>
+    <style>
+        /* 全体の背景：優しいクリーム色 */
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+            background-color: #fbf7f0;
+            color: #5a4b41;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+        
+        /* カード：角を丸くして、ふんわりした影を付ける */
+        .container {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(90, 75, 65, 0.05);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            border: 2px solid #f0e6d6;
+        }
+        
+        /* メイン画像：大きく表示 */
+        .main-img {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            border-radius: 50%;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.08));
+        }
+        
+        h1 { 
+            font-size: 28px; 
+            margin: 15px 0 10px 0; 
+            color: #8c705c; 
+            font-weight: bold;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: #a08875;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        /* リンク・ボタン共通 */
+        .link-section {
+            background: #fdfbf7;
+            padding: 20px 15px;
+            border-radius: 16px;
+            margin-bottom: 18px;
+            border: 1px solid #f3ede2;
+        }
+        
+        .link-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #8c705c;
+            margin-bottom: 12px;
+        }
+        
+        .link-description {
+            font-size: 13px;
+            color: #a08875;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        /* ボタン共通：ぷっくりした可愛いデザイン */
+        a.btn, button.btn {
+            display: inline-block;
+            background-color: #8ebd82;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #6d9e62;
+            transition: all 0.1s;
+            text-decoration: none;
+            width: 85%;
+            box-sizing: border-box;
+            margin-top: 5px;
+        }
+        
+        a.btn:hover, button.btn:hover { 
+            background-color: #7fae73; 
+        }
+        
+        a.btn:active, button.btn:active { 
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #6d9e62;
+        }
+        
+        .icon-emoji {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="pages/images/omu.png" class="main-img" alt="おそうじおむ">
+    <h1>おむらいすの片づけお助けアプリ</h1>
+    <p class="subtitle">ゆるくて優しい、毎日の片づけをサポートするツール集</p>
+    
+    <!-- ゆるお片づけ応援ツール -->
+    <div class="link-section">
+        <span class="icon-emoji">🎰</span>
+        <div class="link-title">ゆる片づけ応援ツール</div>
+        <p class="link-description">3分タイマー、ガチャで場所決めで、片づけを楽しく応援！</p>
+        <a href="pages/01_clean.html" class="btn">ツールを開く</a>
+    </div>
+</div>
+
+</body>
+</html>
