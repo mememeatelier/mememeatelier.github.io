@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>お片づけ記録 - ふっかつのじゅもん</title>
+    <title>お片づけのきろく - ふっかつのじゅもん</title>
     <style>
         * {
             box-sizing: border-box;
@@ -108,7 +108,7 @@
             display: block;
         }
 
-        /* 記録フォーム */
+        /* きろくフォーム */
         .form-group {
             margin-bottom: 14px;
             text-align: left;
@@ -241,19 +241,30 @@
         }
 
         .copy-btn {
-            background-color: #111111;
-            box-shadow: 0 4px 0 #000000;
+            background-color: #d69d7c;
+            box-shadow: 0 4px 0 #b97f61;
             font-size: 13px;
             margin-top: 10px;
         }
 
         .copy-btn:hover {
-            background-color: #222222;
+            background-color: #ca8d6d;
         }
 
         .copy-btn.copied {
             background-color: #8ebd82;
             box-shadow: 0 4px 0 #6d9e62;
+        }
+
+        .share-btn {
+            background-color: #111111;
+            box-shadow: 0 4px 0 #000000;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .share-btn:hover {
+            background-color: #222222;
         }
 
         /* 統計表示 */
@@ -328,7 +339,7 @@
             text-align: right;
         }
 
-        /* 記録リスト */
+        /* きろくリスト */
         .records-list {
             max-height: 300px;
             overflow-y: auto;
@@ -418,21 +429,21 @@
     <a href="../index.html" aria-label="トップページへ戻る">
         <img src="images/omu.png" class="main-img" alt="おそうじおむ">
     </a>
-    <h1>お片づけ記録</h1>
+    <h1>お片づけのきろく</h1>
     <div class="subtitle">～ ふっかつのじゅもん ～</div>
 
     <!-- タブ -->
     <div class="tab-container">
-        <button class="tab-btn active" data-tab="record" type="button">📝 記録する</button>
+        <button class="tab-btn active" data-tab="record" type="button">📝 きろくを書く</button>
         <button class="tab-btn" data-tab="restore" type="button">📜 じゅもんで復元</button>
-        <button class="tab-btn" data-tab="stats" type="button">📊 記録を見る</button>
+        <button class="tab-btn" data-tab="stats" type="button">📊 きろくを見る</button>
     </div>
 
-    <!-- 1. 記録タブ -->
+    <!-- 1. きろくタブ -->
     <div id="record" class="tab-content active">
         <div class="section">
             <span class="icon-emoji">📝</span>
-            <div class="label">今日のお片づけを記録しよう</div>
+            <div class="label">今日のお片づけをきろくしよう</div>
 
             <div class="form-group">
                 <span class="form-label">カテゴリ</span>
@@ -450,21 +461,25 @@
 
             <div class="form-group">
                 <span class="form-label">詳しく（任意）</span>
-                <textarea id="recordDetail" placeholder="例：机の上のゴミ" maxlength="100"></textarea>
+                <textarea id="recordDetail" placeholder="例：つくえのごみ"></textarea>
             </div>
 
-            <button id="saveBtn" type="button">✨ 今日の記録を保存</button>
+            <button id="saveBtn" type="button">✨ 今日のきろくを保存</button>
 
             <div id="saveMessage" style="color: #8ebd82; font-size: 13px; margin-top: 10px; min-height: 20px;"></div>
         </div>
 
         <div class="section">
-            <div class="label">💾 今日のセーブデータ</div>
+            <div class="label">💾 ふっかつのじゅもん</div>
             <div class="notice">
-                📌 ブラウザを閉じても消えないように、毎日の記録が自動で保存されます。
+                ブラウザを閉じても消えないように、毎日のきろくが自動で保存されます。
             </div>
             <div class="kotoba-box" id="todayKotoba">（きろくがまだありません）</div>
-            <button class="copy-btn" id="copyBtn" type="button">📋 じゅもんをコピー</button>
+            <button class="copy-btn" id="copyBtn" type="button">📋 ふっかつのじゅもんをコピー</button>
+            <button class="share-btn" id="shareBtn" type="button">𝕏 でポスト</button>
+            <div class="notice" style="margin-top: 12px; font-size: 11px;">
+                𝕏 でポストされるじゅもんは、省略版です。完全復元用のじゅもんは「ふっかつのじゅもんをコピー」ボタンを使ってください。
+            </div>
         </div>
     </div>
 
@@ -472,14 +487,14 @@
     <div id="restore" class="tab-content">
         <div class="section">
             <span class="icon-emoji">📜</span>
-            <div class="label">じゅもんで記録を復元</div>
+            <div class="label">じゅもんできろくを復元</div>
             <div class="notice">
-                🔮 他のブラウザや端末から、じゅもんを貼り付けて復元できます。
+                他のブラウザや端末から、じゅもんを貼り付けて復元できます。
             </div>
 
             <div class="form-group">
                 <span class="form-label">じゅもんを入力</span>
-                <textarea id="kotobaInput" placeholder="こぴーしたじゅもんをぺーすとしてください" style="min-height: 80px;"></textarea>
+                <textarea id="kotobaInput" placeholder="ふっかつのじゅもんを　いれてください" style="min-height: 80px;"></textarea>
             </div>
 
             <button id="restoreBtn" type="button">✨ じゅもんで復元</button>
@@ -495,48 +510,48 @@
             <div class="label">あなたの進捗</div>
 
             <div class="level-box">
-                <div class="level-label">げんざいのれべる</div>
+                <div class="level-label">現在のレベル</div>
                 <div class="level-display" id="levelDisplay">Lv. 1</div>
                 <div class="level-bar">
                     <div class="level-bar-fill" id="levelBar"></div>
                 </div>
-                <div class="level-text" id="levelProgress">0 / 100 ぽいんと</div>
+                <div class="level-text" id="levelProgress">0 / 100 ポイント</div>
             </div>
 
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">そうきろくすう</div>
+                    <div class="stat-label">総きろく数</div>
                     <div class="stat-value" id="statTotal">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">そうこすう</div>
+                    <div class="stat-label">総個数</div>
                     <div class="stat-value" id="statCount">0</div>
                 </div>
             </div>
 
-            <div class="label" style="margin-top: 16px;">かてごりべつ</div>
+            <div class="label" style="margin-top: 16px;">カテゴリ別</div>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">かたづける</div>
+                    <div class="stat-label">片づける</div>
                     <div class="stat-value" id="statClean">0</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">すてる</div>
+                    <div class="stat-label">捨てる</div>
                     <div class="stat-value" id="statThrow">0</div>
                 </div>
                 <div class="stat-card" style="grid-column: span 2;">
-                    <div class="stat-label">ととのえる</div>
+                    <div class="stat-label">整える</div>
                     <div class="stat-value" id="statArrange">0</div>
                 </div>
             </div>
         </div>
 
         <div class="section">
-            <div class="label">📋 さいきんのきろく</div>
+            <div class="label">📋 最近のきろく</div>
             <div class="records-list" id="recordsList">
                 <div class="empty-state">きろくがまだありません</div>
             </div>
-            <button class="danger" id="clearAllBtn" type="button" style="margin-top: 14px;">🗑️ すべてのきろくをさくじょ</button>
+            <button class="danger" id="clearAllBtn" type="button" style="margin-top: 14px;">🗑️ すべてのきろくを削除</button>
         </div>
     </div>
 </div>
@@ -544,58 +559,174 @@
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <script>
     // ============ じゅもん生成・フォーマット ============
-    const HIRAGANA_SET = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん';
+    const BASE64_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    const HIRAGANA_SET = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶ';
 
     function base64ToHiragana(base64Str) {
-        // Base64文字列をひらがなに変換
+        const cleaned = base64Str.replace(/=+$/, '');
         let result = '';
-        for (let i = 0; i < base64Str.length; i++) {
-            const charCode = base64Str.charCodeAt(i);
-            const index = charCode % HIRAGANA_SET.length;
+        for (const char of cleaned) {
+            const index = BASE64_ALPHABET.indexOf(char);
+            if (index === -1) continue;
             result += HIRAGANA_SET[index];
         }
         return result;
     }
 
     function hiraganaToBase64(hiraganaStr) {
-        // ひらがなをBase64に戻す（逆変換）
-        const base64Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
         let base64Str = '';
-        for (let char of hiraganaStr) {
+        for (const char of hiraganaStr) {
             const index = HIRAGANA_SET.indexOf(char);
             if (index !== -1) {
-                const charIndex = index % base64Chars.length;
-                base64Str += base64Chars[charIndex];
+                base64Str += BASE64_ALPHABET[index];
             }
+        }
+        const remainder = base64Str.length % 4;
+        if (remainder !== 0) {
+            base64Str += '='.repeat(4 - remainder);
         }
         return base64Str;
     }
 
     function formatKotoba(hiraganaStr) {
-        // 3文字+3文字+4文字の形式でフォーマット
-        // 最大50文字: 5行 (3+3+4改行) * 4 + (3+3+4+2) = 50
-        let formatted = '';
-        let lineCount = 0;
-        let lineChars = 0;
+        const chunks = [];
+        for (let i = 0; i < hiraganaStr.length; i += 3) {
+            chunks.push(hiraganaStr.slice(i, i + 3));
+        }
+        return chunks.join(' ');
+    }
 
-        for (let i = 0; i < hiraganaStr.length; i++) {
-            if (lineChars === 3 || lineChars === 6) {
-                formatted += ' '; // スペースで区切り
-                lineChars++;
-            } else if (lineChars === 10) {
-                formatted += '\n'; // 10文字（スペース含む）で改行
-                lineCount++;
-                lineChars = 0;
+    function decodeCompressedKotoba(str) {
+        const cleaned = (str || '').replace(/[\s\n]/g, '');
+        if (!cleaned) return null;
+
+        const base64 = hiraganaToBase64(cleaned);
+        const json = LZString.decompressFromBase64(base64);
+        if (!json) return null;
+
+        try {
+            return JSON.parse(json);
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function summarizeByCategory(records) {
+        const counts = { '片づける': 0, '捨てる': 0, '整える': 0 };
+        records.forEach(record => {
+            if (counts[record.category] !== undefined) {
+                counts[record.category] += Number(record.count) || 0;
             }
+        });
+        return counts;
+    }
 
-            formatted += hiraganaStr[i];
-            lineChars++;
-
-            // 最大50文字で打ち止め
-            if (i >= 49) break;
+    function summarizeTodayAndPrevious(records) {
+        if (!records || records.length === 0) {
+            return {
+                today: { '片づける': 0, '捨てる': 0, '整える': 0 },
+                previous: { '片づける': 0, '捨てる': 0, '整える': 0 }
+            };
         }
 
-        return formatted;
+        const sortedRecords = [...records].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const latestDate = new Date(sortedRecords[sortedRecords.length - 1].date);
+        const anchorStart = new Date(latestDate.getFullYear(), latestDate.getMonth(), latestDate.getDate());
+        const today = { '片づける': 0, '捨てる': 0, '整える': 0 };
+        const previous = { '片づける': 0, '捨てる': 0, '整える': 0 };
+
+        records.forEach(record => {
+            const recordDate = new Date(record.date);
+            const recordDayStart = new Date(recordDate.getFullYear(), recordDate.getMonth(), recordDate.getDate());
+            const category = record.category;
+            const count = Number(record.count) || 0;
+
+            if (recordDayStart.getTime() === anchorStart.getTime()) {
+                if (today[category] !== undefined) today[category] += count;
+                return;
+            }
+
+            if (recordDate < anchorStart && previous[category] !== undefined) {
+                previous[category] += count;
+            }
+        });
+
+        return { today, previous };
+    }
+
+    function generateKotoba(records) {
+        if (!records || records.length === 0) return '';
+        const json = JSON.stringify(records);
+        const compressed = LZString.compressToBase64(json);
+        const hiragana = base64ToHiragana(compressed);
+        return formatKotoba(hiragana);
+    }
+
+    function generateShareKotoba(records) {
+        if (!records || records.length === 0) return '';
+
+        const { today, previous } = summarizeTodayAndPrevious(records);
+        const categories = ['片づける', '捨てる', '整える'];
+        const payload = {
+            type: 'share-summary',
+            t: categories.map(category => Number(today[category]) || 0),
+            p: categories.map(category => Number(previous[category]) || 0)
+        };
+
+        const json = JSON.stringify(payload);
+        const compressed = LZString.compressToBase64(json);
+        const hiragana = base64ToHiragana(compressed);
+        return formatKotoba(hiragana);
+    }
+
+    function restoreKotoba(kotoba) {
+        try {
+            const decoded = decodeCompressedKotoba(kotoba);
+            if (!decoded) throw new Error('Invalid kotoba');
+
+            if (Array.isArray(decoded)) {
+                return decoded;
+            }
+
+            if (decoded.type === 'share-summary') {
+                const categories = ['片づける', '捨てる', '整える'];
+                const todayCounts = Array.isArray(decoded.t) ? decoded.t : [0, 0, 0];
+                const previousCounts = Array.isArray(decoded.p) ? decoded.p : [0, 0, 0];
+                const today = new Date();
+                const yesterday = new Date(today);
+                yesterday.setDate(today.getDate() - 1);
+
+                return categories.flatMap((category, index) => {
+                    const todayCount = Number(todayCounts[index]) || 0;
+                    const previousCount = Number(previousCounts[index]) || 0;
+                    const entries = [];
+
+                    if (todayCount > 0) {
+                        entries.push({
+                            date: today.toISOString(),
+                            category,
+                            count: todayCount,
+                            detail: ''
+                        });
+                    }
+
+                    if (previousCount > 0) {
+                        entries.push({
+                            date: yesterday.toISOString(),
+                            category,
+                            count: previousCount,
+                            detail: `これまで${previousCount}こ`
+                        });
+                    }
+
+                    return entries;
+                });
+            }
+
+            throw new Error('Invalid format');
+        } catch (e) {
+            throw new Error('じゅもんが正しくありません。べつのじゅもんをためしてください。');
+        }
     }
 
     // ============ データ管理 ============
@@ -608,29 +739,6 @@
 
     function saveRecords(records) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-    }
-
-    function generateKotoba(records) {
-        if (records.length === 0) return '';
-        const json = JSON.stringify(records);
-        const compressed = LZString.compressToBase64(json);
-        const hiragana = base64ToHiragana(compressed);
-        return formatKotoba(hiragana);
-    }
-
-    function restoreKotoba(kotoba) {
-        try {
-            // スペースと改行を除去
-            const cleaned = kotoba.replace(/[\s\n]/g, '');
-            const base64 = hiraganaToBase64(cleaned);
-            const json = LZString.decompressFromBase64(base64);
-            if (!json) throw new Error('Invalid kotoba');
-            const records = JSON.parse(json);
-            if (!Array.isArray(records)) throw new Error('Invalid format');
-            return records;
-        } catch (e) {
-            throw new Error('じゅもんがただしくありません。べつのじゅもんをこころみてください。');
-        }
     }
 
     function calculateLevel(records) {
@@ -667,7 +775,7 @@
 
         document.getElementById('levelDisplay').innerText = `Lv. ${level}`;
         document.getElementById('levelBar').style.width = `${(currentLevelPoints / nextLevelPoints) * 100}%`;
-        document.getElementById('levelProgress').innerText = `${currentLevelPoints} / ${nextLevelPoints} ぽいんと`;
+        document.getElementById('levelProgress').innerText = `${currentLevelPoints} / ${nextLevelPoints} ポイント`;
 
         document.getElementById('statTotal').innerText = totalRecords;
         document.getElementById('statCount').innerText = totalCount;
@@ -731,13 +839,13 @@
         });
     });
 
-    // ============ 記録保存 ============
+    // ============ きろく保存 ============
     document.getElementById('saveBtn').addEventListener('click', () => {
         const count = parseInt(document.getElementById('recordCount').value) || 1;
         const detail = document.getElementById('recordDetail').value.trim();
 
         if (count <= 0) {
-            alert('1こいじょうきろくしてください');
+            alert('1個以上きろくしてください');
             return;
         }
 
@@ -752,7 +860,7 @@
         saveRecords(records);
         document.getElementById('recordCount').value = '1';
         document.getElementById('recordDetail').value = '';
-        document.getElementById('saveMessage').innerText = '✨ きろくしました！えらい！';
+        document.getElementById('saveMessage').innerText = '✨ きろくしました！';
 
         setTimeout(() => {
             document.getElementById('saveMessage').innerText = '';
@@ -771,32 +879,57 @@
 
         navigator.clipboard.writeText(kotobaText).then(() => {
             const btn = document.getElementById('copyBtn');
-            btn.innerText = '✓ こぴーしました！';
+            btn.innerText = '✓ コピーしました！';
             btn.classList.add('copied');
             setTimeout(() => {
-                btn.innerText = '📋 じゅもんをコピー';
+                btn.innerText = '📋 ふっかつのじゅもんをコピー';
                 btn.classList.remove('copied');
             }, 2000);
         }).catch(err => {
-            alert('こぴーにしっぱいしました');
+            alert('コピーにしっぱいしました');
         });
+    });
+
+    function buildShareText() {
+        const shortText = 'ふっかつのじゅもんをつくったよ！\nお片づけのきろくをみんなにシェアしよう。\nhttps://mememeatelier.github.io/';
+
+        const records = loadRecords();
+        if (!records || records.length === 0) {
+            return shortText;
+        }
+
+        const { today, previous } = summarizeTodayAndPrevious(records);
+        const spell = generateShareKotoba(records);
+        const summaryText = `お片づけのきろく 片づける${today['片づける']}・捨てる${today['捨てる']}・整える${today['整える']} / これまで 片づける${previous['片づける']}こ・捨てる${previous['捨てる']}こ・整える${previous['整える']}こ\n${spell}https://mememeatelier.github.io/`;
+
+        return summaryText.length <= 250 ? summaryText : `${shortText}\n${spell}`;
+    }
+
+    document.getElementById('shareBtn').addEventListener('click', () => {
+        const records = loadRecords();
+        if (!records || records.length === 0) {
+            alert('きろくがまだありません');
+            return;
+        }
+
+        const shareText = buildShareText();
+        const shareUrl = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}`;
+        window.open(shareUrl, '_blank', 'noopener,noreferrer,width=600,height=420');
     });
 
     // ============ 復元機能 ============
     document.getElementById('restoreBtn').addEventListener('click', () => {
         const kotobaText = document.getElementById('kotobaInput').value.trim();
         if (!kotobaText) {
-            alert('じゅもんをにゅうりょくしてください');
+            alert('じゅもんを入力してください');
             return;
         }
 
         try {
             const restoredRecords = restoreKotoba(kotobaText);
-            const currentRecords = loadRecords();
-            const merged = [...currentRecords, ...restoredRecords];
-            saveRecords(merged);
+            saveRecords(restoredRecords);
 
-            document.getElementById('restoreMessage').innerText = `✨ ${restoredRecords.length}けんのきろくをふっかつしました！`;
+            document.getElementById('restoreMessage').innerText = `✨ そのときのきろくを復元しました！`;
             document.getElementById('restoreMessage').style.color = '#8ebd82';
             document.getElementById('kotobaInput').value = '';
 
@@ -813,10 +946,10 @@
 
     // ============ クリア機能 ============
     document.getElementById('clearAllBtn').addEventListener('click', () => {
-        if (confirm('⚠️ ほんとうにすべてのきろくをさくじょしますか？このそうさはとりけせません。')) {
+        if (confirm('⚠️ すべてのきろくを削除しますか？この操作は取り消せません。')) {
             localStorage.removeItem(STORAGE_KEY);
             updateRecordDisplay();
-            alert('すべてのきろくをさくじょしました。');
+            alert('すべてのきろくを削除しました。');
         }
     });
 
