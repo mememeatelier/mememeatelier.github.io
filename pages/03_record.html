@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お片づけ記録 - ふっかつのじゅもん</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+            background-color: #fbf7f0;
+            color: #5a4b41;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 12px;
+            display: block;
+        }
+
+        .container {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(90, 75, 65, 0.05);
+            width: min(90vw, 380px);
+            max-width: calc(100vw - 24px);
+            margin: 0 auto;
+            text-align: center;
+            border: 2px solid #f0e6d6;
+        }
+
+        .main-img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 5px;
+            border-radius: 50%;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.08));
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 0 0 5px 0;
+            color: #8c705c;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: #a08875;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            background: #fdfbf7;
+            padding: 18px 15px;
+            border-radius: 16px;
+            margin-bottom: 18px;
+            border: 1px solid #f3ede2;
+        }
+
+        .label {
+            font-size: 13px;
+            color: #a08875;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* タブ切り替え */
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #efe5d6;
+            color: #7d665c;
+            transition: all 0.15s ease;
+        }
+
+        .tab-btn.active {
+            background: #8ebd82;
+            color: white;
+            box-shadow: 0 4px 0 #6d9e62;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 記録フォーム */
+        .form-group {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        .form-label {
+            font-size: 12px;
+            color: #a08875;
+            font-weight: bold;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .category-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .category-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #efe5d6;
+            color: #7d665c;
+            transition: all 0.15s ease;
+        }
+
+        .category-btn.active {
+            background: #8ebd82;
+            color: white;
+            box-shadow: 0 3px 0 #6d9e62;
+        }
+
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #f0e6d6;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            color: #5a4b41;
+            resize: vertical;
+        }
+
+        input[type="number"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #8ebd82;
+            box-shadow: 0 0 0 3px rgba(142, 189, 130, 0.2);
+        }
+
+        input[type="number"] {
+            height: 40px;
+        }
+
+        button {
+            background-color: #8ebd82;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #6d9e62;
+            transition: all 0.1s;
+            width: 85%;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background-color: #7fae73;
+        }
+
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #6d9e62;
+        }
+
+        button.secondary {
+            background-color: #d69d7c;
+            box-shadow: 0 4px 0 #b97f61;
+        }
+
+        button.secondary:hover {
+            background-color: #ca8d6d;
+        }
+
+        button.secondary:active {
+            box-shadow: 0 0 0 #b97f61;
+        }
+
+        button.danger {
+            background-color: #e78878;
+            box-shadow: 0 4px 0 #cc6c5c;
+            font-size: 12px;
+            padding: 8px 12px;
+            width: auto;
+        }
+
+        button.danger:hover {
+            background-color: #da7767;
+        }
+
+        /* じゅもん表示 */
+        .kotoba-box {
+            background: #f5f0e8;
+            border: 2px dashed #d4c4b0;
+            border-radius: 12px;
+            padding: 14px 12px;
+            margin: 12px 0;
+            word-break: break-all;
+            line-height: 1.8;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #7d665c;
+            min-height: 60px;
+            text-align: center;
+            user-select: all;
+        }
+
+        .copy-btn {
+            background-color: #111111;
+            box-shadow: 0 4px 0 #000000;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #222222;
+        }
+
+        .copy-btn.copied {
+            background-color: #8ebd82;
+            box-shadow: 0 4px 0 #6d9e62;
+        }
+
+        /* 統計表示 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #f3ede2;
+            border-radius: 12px;
+            padding: 12px 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #a08875;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #8ebd82;
+        }
+
+        /* レベル表示 */
+        .level-box {
+            background: linear-gradient(135deg, #fef3e2 0%, #fef9f1 100%);
+            border: 2px solid #f0e6d6;
+            border-radius: 16px;
+            padding: 16px 12px;
+            margin-bottom: 12px;
+        }
+
+        .level-label {
+            font-size: 12px;
+            color: #a08875;
+            margin-bottom: 4px;
+        }
+
+        .level-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #d4a574;
+            margin-bottom: 6px;
+        }
+
+        .level-bar {
+            width: 100%;
+            height: 8px;
+            background: #efe5d6;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .level-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8ebd82, #7aa874);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .level-text {
+            font-size: 11px;
+            color: #a08875;
+            text-align: right;
+        }
+
+        /* 記録リスト */
+        .records-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #f3ede2;
+            border-radius: 12px;
+            background: white;
+        }
+
+        .record-item {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f3ede2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-info {
+            text-align: left;
+            flex: 1;
+        }
+
+        .record-date {
+            font-size: 11px;
+            color: #a08875;
+            margin-bottom: 2px;
+        }
+
+        .record-text {
+            color: #5a4b41;
+            margin-bottom: 2px;
+        }
+
+        .record-count {
+            font-weight: bold;
+            color: #8ebd82;
+        }
+
+        .record-delete {
+            background: none;
+            border: none;
+            color: #cc6c5c;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            box-shadow: none;
+            margin: 0;
+            width: auto;
+        }
+
+        .record-delete:hover {
+            background-color: rgba(230, 120, 120, 0.1);
+        }
+
+        .empty-state {
+            padding: 20px 12px;
+            text-align: center;
+            color: #a08875;
+            font-size: 13px;
+        }
+
+        .icon-emoji {
+            font-size: 30px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .notice {
+            background: #fff8f0;
+            border-left: 3px solid #d69d7c;
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #a08875;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="../index.html" aria-label="トップページへ戻る">
+        <img src="images/omu.png" class="main-img" alt="おそうじおむ">
+    </a>
+    <h1>お片づけ記録</h1>
+    <div class="subtitle">～ ふっかつのじゅもん ～</div>
+
+    <!-- タブ -->
+    <div class="tab-container">
+        <button class="tab-btn active" data-tab="record" type="button">📝 記録する</button>
+        <button class="tab-btn" data-tab="restore" type="button">📜 じゅもんで復元</button>
+        <button class="tab-btn" data-tab="stats" type="button">📊 記録を見る</button>
+    </div>
+
+    <!-- 1. 記録タブ -->
+    <div id="record" class="tab-content active">
+        <div class="section">
+            <span class="icon-emoji">📝</span>
+            <div class="label">今日のお片づけを記録しよう</div>
+
+            <div class="form-group">
+                <span class="form-label">カテゴリ</span>
+                <div class="category-row">
+                    <button class="category-btn active" data-category="片づける" type="button">片づける</button>
+                    <button class="category-btn" data-category="捨てる" type="button">捨てる</button>
+                    <button class="category-btn" data-category="整える" type="button">整える</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="form-label">個数</span>
+                <input type="number" id="recordCount" min="0" max="999" value="1" aria-label="個数">
+            </div>
+
+            <div class="form-group">
+                <span class="form-label">詳しく（任意）</span>
+                <textarea id="recordDetail" placeholder="例：机の上のゴミ" maxlength="100"></textarea>
+            </div>
+
+            <button id="saveBtn" type="button">✨ 今日の記録を保存</button>
+
+            <div id="saveMessage" style="color: #8ebd82; font-size: 13px; margin-top: 10px; min-height: 20px;"></div>
+        </div>
+
+        <div class="section">
+            <div class="label">💾 今日のセーブデータ</div>
+            <div class="notice">
+                📌 ブラウザを閉じても消えないように、毎日の記録が自動で保存されます。
+            </div>
+            <div class="kotoba-box" id="todayKotoba">（記録がまだありません）</div>
+            <button class="copy-btn" id="copyBtn" type="button">📋 じゅもんをコピー</button>
+        </div>
+    </div>
+
+    <!-- 2. 復元タブ -->
+    <div id="restore" class="tab-content">
+        <div class="section">
+            <span class="icon-emoji">📜</span>
+            <div class="label">じゅもんで記録を復元</div>
+            <div class="notice">
+                🔮 他のブラウザや端末から、じゅもんを貼り付けて復元できます。
+            </div>
+
+            <div class="form-group">
+                <span class="form-label">じゅもんを入力</span>
+                <textarea id="kotobaInput" placeholder="コピーした呪文をペーストしてください" style="min-height: 80px;"></textarea>
+            </div>
+
+            <button id="restoreBtn" type="button">✨ じゅもんで復元</button>
+
+            <div id="restoreMessage" style="font-size: 13px; margin-top: 10px; min-height: 20px;"></div>
+        </div>
+    </div>
+
+    <!-- 3. 統計タブ -->
+    <div id="stats" class="tab-content">
+        <div class="section">
+            <span class="icon-emoji">📊</span>
+            <div class="label">あなたの進捗</div>
+
+            <div class="level-box">
+                <div class="level-label">現在のレベル</div>
+                <div class="level-display" id="levelDisplay">Lv. 1</div>
+                <div class="level-bar">
+                    <div class="level-bar-fill" id="levelBar"></div>
+                </div>
+                <div class="level-text" id="levelProgress">0 / 100 ポイント</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">総記録数</div>
+                    <div class="stat-value" id="statTotal">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">総個数</div>
+                    <div class="stat-value" id="statCount">0</div>
+                </div>
+            </div>
+
+            <div class="label" style="margin-top: 16px;">カテゴリ別</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">片づける</div>
+                    <div class="stat-value" id="statClean">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">捨てる</div>
+                    <div class="stat-value" id="statThrow">0</div>
+                </div>
+                <div class="stat-card" style="grid-column: span 2;">
+                    <div class="stat-label">整える</div>
+                    <div class="stat-value" id="statArrange">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="label">📋 最近の記録</div>
+            <div class="records-list" id="recordsList">
+                <div class="empty-state">記録がまだありません</div>
+            </div>
+            <button class="danger" id="clearAllBtn" type="button" style="margin-top: 14px;">🗑️ すべての記録を削除</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+<script>
+    // ============ データ管理 ============
+    const STORAGE_KEY = 'cleanup_records';
+
+    function loadRecords() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        return stored ? JSON.parse(stored) : [];
+    }
+
+    function saveRecords(records) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    function generateKotoba(records) {
+        if (records.length === 0) return '';
+        const json = JSON.stringify(records);
+        return LZString.compressToBase64(json);
+    }
+
+    function restoreKotoba(kotoba) {
+        try {
+            const json = LZString.decompressFromBase64(kotoba.trim());
+            if (!json) throw new Error('Invalid kotoba');
+            const records = JSON.parse(json);
+            if (!Array.isArray(records)) throw new Error('Invalid format');
+            return records;
+        } catch (e) {
+            throw new Error('じゅもんが正しくありません。別のじゅもんを試してください。');
+        }
+    }
+
+    function calculateLevel(records) {
+        let points = 0;
+        records.forEach(record => {
+            points += record.count * 10; // 1個 = 10ポイント
+        });
+        const level = Math.floor(points / 100) + 1;
+        const currentLevelPoints = (points % 100);
+        const nextLevelPoints = 100;
+        return { level, currentLevelPoints, nextLevelPoints, totalPoints: points };
+    }
+
+    // ============ UI要素の更新 ============
+    let selectedCategory = '片づける';
+
+    function updateRecordDisplay() {
+        const records = loadRecords();
+        const kotoba = generateKotoba(records);
+        document.getElementById('todayKotoba').innerText = kotoba || '（記録がまだありません）';
+        updateStats();
+    }
+
+    function updateStats() {
+        const records = loadRecords();
+        const { level, currentLevelPoints, nextLevelPoints, totalPoints } = calculateLevel(records);
+
+        const totalRecords = records.length;
+        const totalCount = records.reduce((sum, r) => sum + r.count, 0);
+
+        const statClean = records.filter(r => r.category === '片づける').reduce((sum, r) => sum + r.count, 0);
+        const statThrow = records.filter(r => r.category === '捨てる').reduce((sum, r) => sum + r.count, 0);
+        const statArrange = records.filter(r => r.category === '整える').reduce((sum, r) => sum + r.count, 0);
+
+        document.getElementById('levelDisplay').innerText = `Lv. ${level}`;
+        document.getElementById('levelBar').style.width = `${(currentLevelPoints / nextLevelPoints) * 100}%`;
+        document.getElementById('levelProgress').innerText = `${currentLevelPoints} / ${nextLevelPoints} ポイント`;
+
+        document.getElementById('statTotal').innerText = totalRecords;
+        document.getElementById('statCount').innerText = totalCount;
+        document.getElementById('statClean').innerText = statClean;
+        document.getElementById('statThrow').innerText = statThrow;
+        document.getElementById('statArrange').innerText = statArrange;
+
+        updateRecordsList(records);
+    }
+
+    function updateRecordsList(records) {
+        const list = document.getElementById('recordsList');
+        if (records.length === 0) {
+            list.innerHTML = '<div class="empty-state">記録がまだありません</div>';
+            return;
+        }
+
+        const sortedRecords = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
+        list.innerHTML = sortedRecords.map((record, index) => `
+            <div class="record-item">
+                <div class="record-info">
+                    <div class="record-date">${new Date(record.date).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', weekday: 'short' })}</div>
+                    <div class="record-text">${record.category} ${record.detail ? `「${record.detail}」` : ''}</div>
+                    <div class="record-count">+${record.count}個</div>
+                </div>
+                <button class="record-delete" data-index="${index}" type="button">✕</button>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.record-delete').forEach(btn => {
+            btn.addEventListener('click', () => deleteRecord(parseInt(btn.dataset.index)));
+        });
+    }
+
+    function deleteRecord(index) {
+        const records = loadRecords();
+        records.splice(index, 1);
+        saveRecords(records);
+        updateRecordDisplay();
+    }
+
+    // ============ タブ切り替え ============
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.dataset.tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        });
+    });
+
+    // ============ カテゴリ選択 ============
+    document.querySelectorAll('[data-category]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.dataset.category) {
+                selectedCategory = btn.dataset.category;
+                document.querySelectorAll('[data-category]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+        });
+    });
+
+    // ============ 記録保存 ============
+    document.getElementById('saveBtn').addEventListener('click', () => {
+        const count = parseInt(document.getElementById('recordCount').value) || 1;
+        const detail = document.getElementById('recordDetail').value.trim();
+
+        if (count <= 0) {
+            alert('1個以上記録してください');
+            return;
+        }
+
+        const records = loadRecords();
+        records.push({
+            date: new Date().toISOString(),
+            category: selectedCategory,
+            count: count,
+            detail: detail
+        });
+
+        saveRecords(records);
+        document.getElementById('recordCount').value = '1';
+        document.getElementById('recordDetail').value = '';
+        document.getElementById('saveMessage').innerText = '✨ 記録しました！えらい！';
+
+        setTimeout(() => {
+            document.getElementById('saveMessage').innerText = '';
+        }, 3000);
+
+        updateRecordDisplay();
+    });
+
+    // ============ コピー機能 ============
+    document.getElementById('copyBtn').addEventListener('click', () => {
+        const kotobaText = document.getElementById('todayKotoba').innerText;
+        if (kotobaText === '（記録がまだありません）') {
+            alert('記録がまだありません');
+            return;
+        }
+
+        navigator.clipboard.writeText(kotobaText).then(() => {
+            const btn = document.getElementById('copyBtn');
+            btn.innerText = '✓ コピーしました！';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.innerText = '📋 じゅもんをコピー';
+                btn.classList.remove('copied');
+            }, 2000);
+        }).catch(err => {
+            alert('コピーに失敗しました');
+        });
+    });
+
+    // ============ 復元機能 ============
+    document.getElementById('restoreBtn').addEventListener('click', () => {
+        const kotobaText = document.getElementById('kotobaInput').value.trim();
+        if (!kotobaText) {
+            alert('じゅもんを入力してください');
+            return;
+        }
+
+        try {
+            const restoredRecords = restoreKotoba(kotobaText);
+            const currentRecords = loadRecords();
+            const merged = [...currentRecords, ...restoredRecords];
+            saveRecords(merged);
+
+            document.getElementById('restoreMessage').innerText = `✨ ${restoredRecords.length}件の記録を復元しました！`;
+            document.getElementById('restoreMessage').style.color = '#8ebd82';
+            document.getElementById('kotobaInput').value = '';
+
+            setTimeout(() => {
+                document.getElementById('restoreMessage').innerText = '';
+            }, 3000);
+
+            updateRecordDisplay();
+        } catch (e) {
+            document.getElementById('restoreMessage').innerText = `❌ ${e.message}`;
+            document.getElementById('restoreMessage').style.color = '#cc6c5c';
+        }
+    });
+
+    // ============ クリア機能 ============
+    document.getElementById('clearAllBtn').addEventListener('click', () => {
+        if (confirm('⚠️ 本当にすべての記録を削除しますか？この操作は取り消せません。')) {
+            localStorage.removeItem(STORAGE_KEY);
+            updateRecordDisplay();
+            alert('すべての記録を削除しました。');
+        }
+    });
+
+    // ============ 初期化 ============
+    updateRecordDisplay();
+</script>
+
+</body>
+</html>
