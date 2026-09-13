@@ -10,6 +10,16 @@
     <meta name="twitter:card" content="summary_large_image">
     <title>おむらいすの片づけお助けアプリ</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         /* 全体の背景：優しいクリーム色 */
         body {
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
@@ -20,7 +30,7 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px 0;
+            padding: 20px 12px;
         }
         
         /* カード：角を丸くして、ふんわりした影を付ける */
@@ -29,8 +39,9 @@
             padding: 40px 30px;
             border-radius: 24px;
             box-shadow: 0 8px 30px rgba(90, 75, 65, 0.05);
-            width: 90%;
-            max-width: 450px;
+            width: min(90vw, 450px);
+            max-width: calc(100vw - 24px);
+            margin: 0 auto;
             text-align: center;
             border: 2px solid #f0e6d6;
         }
