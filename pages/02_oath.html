@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お片づけ宣言</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+            background-color: #fbf7f0;
+            color: #5a4b41;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 12px;
+            display: block;
+        }
+
+        .container {
+            background: white;
+            padding: 30px 20px 24px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(90, 75, 65, 0.05);
+            width: min(90vw, 380px);
+            max-width: calc(100vw - 24px);
+            margin: 0 auto;
+            text-align: center;
+            border: 2px solid #f0e6d6;
+        }
+
+        .main-img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 5px;
+            border-radius: 50%;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.08));
+        }
+
+        h1 {
+            font-size: 22px;
+            margin: 0 0 20px 0;
+            color: #8c705c;
+            font-weight: bold;
+        }
+
+        .section {
+            background: #fdfbf7;
+            padding: 18px 15px;
+            border-radius: 16px;
+            margin-bottom: 18px;
+            border: 1px solid #f3ede2;
+        }
+
+        .label {
+            font-size: 13px;
+            color: #a08875;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .category-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .category-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #efe5d6;
+            color: #7d665c;
+            transition: all 0.15s ease;
+        }
+
+        .category-btn.active {
+            background: #8ebd82;
+            color: white;
+            box-shadow: 0 4px 0 #6d9e62;
+        }
+
+        .prompt-box {
+            width: 100%;
+            min-height: 76px;
+            border: 2px solid #f0e6d6;
+            border-radius: 16px;
+            background: white;
+            padding: 12px 14px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #5a4b41;
+            resize: vertical;
+            margin-bottom: 12px;
+        }
+
+        .prompt-box:focus {
+            outline: 3px solid rgba(142, 189, 130, 0.22);
+            border-color: #8ebd82;
+        }
+
+        button {
+            background-color: #8ebd82;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #6d9e62;
+            transition: all 0.1s;
+            width: 85%;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background-color: #7fae73;
+        }
+
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #6d9e62;
+        }
+
+        .secondary {
+            background-color: #d69d7c;
+            box-shadow: 0 4px 0 #b97f61;
+            margin-top: 12px;
+        }
+
+        .secondary:hover {
+            background-color: #ca8d6d;
+        }
+
+        .share-btn {
+            background-color: #111111;
+            box-shadow: 0 4px 0 #000000;
+            margin-top: 14px;
+            font-size: 14px;
+        }
+
+        .share-btn:hover {
+            background-color: #222222;
+        }
+
+        .share-btn:active {
+            box-shadow: 0 0 0 #000000;
+        }
+
+        .praise {
+            min-height: 54px;
+            margin-top: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #8c705c;
+            line-height: 1.6;
+        }
+
+        .micro {
+            font-size: 12px;
+            color: #a08875;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="../index.html" aria-label="トップページへ戻る">
+        <img src="images/omu.png" class="main-img" alt="おそうじおむ">
+    </a>
+    <h1>お片づけ宣言</h1>
+
+    <div class="section">
+        <div class="label">今日のカテゴリ</div>
+        <div class="category-row">
+            <button class="category-btn active" data-category="片づける" type="button">片づける</button>
+            <button class="category-btn" data-category="捨てる" type="button">捨てる</button>
+            <button class="category-btn" data-category="整える" type="button">整える</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="label">今日の宣言</div>
+        <textarea id="declarationText" class="prompt-box" aria-label="宣言文">机の上のゴミを1つ拾う</textarea>
+        <button class="secondary" id="randomBtn" type="button">他の候補にしてみる</button>
+        <button id="declareBtn" type="button">この宣言で始める</button>
+        <div id="praise" class="praise">今日の一歩を決めたね。名前をつけて、やってみよう。</div>
+        <button class="share-btn" id="shareBtn" type="button">𝕏 で宣言を共有する</button>
+        <div class="micro">今日の宣言をXでみんなに伝えて。</div>
+        <div class="micro">後に引けなくなろう。</div>
+    </div>
+</div>
+
+<script>
+    const prompts = {
+        "片づける": [
+            "机の上のゴミを1つ拾う",
+            "玄関の靴を1足戻す",
+            "洗面台の小物を1つ戻す",
+            "机の周りの紙を1枚片づける",
+            "カーテンの横のちょっとした散らかりを整える",
+            "ベッドの横の物を1つ戻す",
+            "リビングのクッションを1つ整える",
+            "キッチンのまな板を1つ片づける",
+            "棚の前の小物を1つ戻す",
+            "机の下の足元を1か所だけ整える",
+            "コンロの横の調味料を1つ戻す",
+            "テレビ周りのリモコンを1つ整理する",
+            "洗濯物の山から1枚を片づける",
+            "玄関マットの前をサッと整える",
+            "テーブルの上のコップを1つ戻す",
+            "ランドセルやカバンの中身を1箇所だけ整える",
+            "押し入れの前の小物を1つ戻す",
+            "机の上のペンを1本整理する",
+            "電源ケーブルを1本まとめる",
+            "本棚の1段だけ見直す"
+        ],
+        "捨てる": [
+            "使ってないレシートを1枚捨てる",
+            "古い袋を1つゴミ箱へ持っていく",
+            "使わない小物を1つ選んで捨てる",
+            "壊れた文房具を1つ処分する",
+            "古いチラシを1枚捨てる",
+            "足りないことがわかっている袋を1つ捨てる",
+            "使ってない食品の空き容器を1個捨てる",
+            "使ってないイヤホンのケーブルを1本処分する",
+            "期限切れの小物を1つ捨てる",
+            "使わないカードを1枚捨てる",
+            "不要なラベルを1枚取る",
+            "古いメモを1枚破棄する",
+            "使ってないストラップを1つ整理する",
+            "使っていない小さな容器を1つ捨てる",
+            "古いガチャのカプセルを1個処分する",
+            "使ってないクリップを1つ捨てる",
+            "いらない包装紙を1枚処分する",
+            "古いタオルを1枚見直す",
+            "使ってない化粧品の小袋を1つ捨てる",
+            "使ってないコスメの容器を1つ捨てる"
+        ],
+        "整える": [
+            "洗面台の鏡周りを1か所だけ整える",
+            "引き出しの1段を整える",
+            "クローゼットの前の棚を整える",
+            "冷蔵庫のドアポケットを1個だけ整える",
+            "ポケットの中身を1か所だけ整える",
+            "玄関の棚を1段整える",
+            "本棚の1段だけを整える",
+            "机の引き出しを1段だけ整える",
+            "浴室の小物を1つ戻す",
+            "洗濯機の横を1か所だけ整える",
+            "玄関の靴箱を1段整理する",
+            "冷蔵庫の保存容器を1つ整える",
+            "服のハンガーを1つ整える",
+            "キッチンの調味料の並びを整える",
+            "鍵や財布の置き場を整える",
+            "床に落ちた小物を1つ拾って整える",
+            "消耗品の置き場を1か所見直す",
+            "棚の上のコップを1つ並べ直す",
+            "テーブルの横の小物を1つ整理する",
+            "下着の収納を1段整える"
+        ]
+    };
+
+    const praises = [
+        "今日の一歩、めちゃくちゃえらい。",
+        "小さくていい。今のあなた、ちゃんと進んでる。",
+        "宣言した時点で、もう勝ち。",
+        "今日は「始めた」が最強だったね。",
+        "その一歩が、部屋を変えるきっかけになる。",
+        "えらい。ほんとにちゃんと始めたね。",
+        "今日のあなたは、すでにすごい。",
+        "1つでいい。今日のあなたはちゃんと前進してる。",
+        "ほら、もう始まってる。",
+        "片づけは始める前が大変。今日はその一歩がすごい。",
+        "この宣言、ちゃんと価値がある。",
+        "小さな一歩が、あとから大きく効くんだよ。",
+        "今日の宣言、いいね。ちゃんと続いてる。",
+        "すごい。今のあなたは、ちゃんと自分を助けてる。"
+    ];
+
+    let selectedCategory = '片づける';
+
+    const declarationText = document.getElementById('declarationText');
+    const randomBtn = document.getElementById('randomBtn');
+    const declareBtn = document.getElementById('declareBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const praiseEl = document.getElementById('praise');
+
+    function setCategory(category) {
+        selectedCategory = category;
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.classList.toggle('active', button.dataset.category === category);
+        });
+        if (!declarationText.value || declarationText.value.trim() === '') {
+            pickRandomPrompt();
+        }
+    }
+
+    function pickRandomPrompt() {
+        const items = prompts[selectedCategory];
+        const randomText = items[Math.floor(Math.random() * items.length)];
+        declarationText.value = randomText;
+    }
+
+    randomBtn.addEventListener('click', () => {
+        pickRandomPrompt();
+    });
+
+    document.querySelectorAll('.category-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            setCategory(button.dataset.category);
+        });
+    });
+
+    declareBtn.addEventListener('click', () => {
+        const text = declarationText.value.trim();
+        if (!text) {
+            declarationText.focus();
+            return;
+        }
+        const randomPraise = praises[Math.floor(Math.random() * praises.length)];
+        praiseEl.innerText = randomPraise;
+    });
+
+    shareBtn.addEventListener('click', () => {
+        const text = declarationText.value.trim() || '今日の片づけ宣言';
+        const siteUrl = 'https://mememeatelier.github.io/';
+        const shareText = `今日の宣言：${text}\nカテゴリ：${selectedCategory}\n\n今日の一歩を始めたよ！\n#お片づけ宣言 #今日の一歩 #ゆるお片づけ`;
+        const xUrl = `https://x.com/intent/post?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(siteUrl)}`;
+        window.open(xUrl, '_blank', 'noopener,noreferrer');
+    });
+
+    declarationText.addEventListener('input', () => {
+        if (declarationText.value.trim()) {
+            praiseEl.innerText = '今日の一歩を決めたね。名前をつけて、やってみよう。';
+        }
+    });
+
+    pickRandomPrompt();
+</script>
+
+</body>
+</html>
