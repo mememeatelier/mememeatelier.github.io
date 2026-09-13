@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ゆるお片づけ応援ツール</title>
+    <style>
+        /* 全体の背景：優しいクリーム色 */
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+            background-color: #fbf7f0;
+            color: #5a4b41;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+        /* カード：角を丸くして、ふんわりした影を付ける */
+        .container {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(90, 75, 65, 0.05);
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            border: 2px solid #f0e6d6;
+        }
+        /* おそうじおむ用スタイル */
+        .main-img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 5px;
+            border-radius: 50%;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.08));
+        }
+        h1 { 
+            font-size: 22px; 
+            margin: 0 0 25px 0; 
+            color: #8c705c; 
+            font-weight: bold;
+        }
+        /* 各機能のブロック：淡いパステルカラー */
+        .section {
+            background: #fdfbf7;
+            padding: 18px 15px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid #f3ede2;
+        }
+        .label { 
+            font-size: 13px; 
+            color: #a08875; 
+            margin-bottom: 10px; 
+            font-weight: bold; 
+        }
+        
+        /* タイマー表示 */
+        .timer-display { font-size: 46px; font-weight: bold; color: #7aa874; margin: 5px 0; font-variant-numeric: tabular-nums; }
+        
+        /* カウンター表示 */
+        .counter-display { font-size: 32px; font-weight: bold; color: #ebb02d; margin: 5px 0; }
+        
+        /* ガチャ表示 */
+        .gacha-display { font-size: 18px; font-weight: bold; color: #d86443; margin: 10px 0; min-height: 27px; }
+
+        /* ボタン共通：ぷっくりした可愛いデザイン */
+        button {
+            background-color: #8ebd82;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #6d9e62;
+            transition: all 0.1s;
+            width: 85%;
+            margin-top: 5px;
+        }
+        button:hover { background-color: #7fae73; }
+        button:active { 
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #6d9e62;
+        }
+        
+        /* タイマー停止ボタン（優しい赤） */
+        button.stop { background-color: #e78878; box-shadow: 0 4px 0 #cc6c5c; }
+        button.stop:hover { background-color: #da7767; }
+        button.stop:active { box-shadow: 0 0 0 #cc6c5c; }
+
+        /* X投稿ボタン */
+        button.share-btn {
+            background-color: #111111;
+            box-shadow: 0 4px 0 #000000;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        button.share-btn:hover { background-color: #222222; }
+        button.share-btn:active { box-shadow: 0 0 0 #000000; }
+
+        .icon-emoji {
+            font-size: 30px;
+            margin-bottom: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <img src="images/omu.png" class="main-img" alt="おそうじおむ">
+    <h1>ゆるお片づけ応援ツール</h1>
+
+    <!-- 1. エリアガチャ機能 -->
+    <div class="section">
+        <span class="icon-emoji">🎰</span>
+        <div class="label">どこからやる？</div>
+        <div class="gacha-display" id="gacha-text">ボタンを押して決める</div>
+        <button onclick="spinGacha()">場所をガチャで決める</button>
+    </div>
+
+    <!-- 2. 3分タイマー機能 -->
+    <div class="section">
+        <span class="icon-emoji">⏳</span>
+        <div class="label">3分だけがんばる</div>
+        <div class="timer-display" id="timer-text">03:00</div>
+        <button id="timer-btn" onclick="toggleTimer()">タイマースタート</button>
+    </div>
+
+    <!-- 3. 1日1捨てカウンター機能 -->
+    <div class="section">
+        <span class="icon-emoji">🗑 </span>
+        <div class="label">今日の「1捨て」記録</div>
+        <div class="counter-display"><span id="counter-text">0</span> 個</div>
+        <button onclick="countUp()">1つ手放した！</button>
+        
+        <!-- X共有ボタン -->
+        <button class="share-btn" onclick="shareToX()">
+            𝕏 結果をポストする
+        </button>
+    </div>
+</div>
+
+<script>
+    let currentPlace = "家の中";
+    const places = [
+        // 机・書類・PCまわり
+        "💻 机の上のササッと片付け", "🗂️ 引き出しの1段整理", "🪙 財布の中のレシート破棄", "🥫 机の上の空き缶・ボトルゴミ箱へ",
+        "📱 スマホ画面のティッシュ拭き", "🖥️ PCデスクトップの不要ファイル削除", "✉️ 溜まった郵便物の即仕分け", "✏️ ペン立てのインク切れペン間引き",
+        
+        // 床・衣類・玄関
+        "🧹 床の上の1箇所クリア", "👕 床の服の1着ハンガー掛け", "🧦 脱ぎっぱなし靴下の洗濯カゴ行き", "👟 玄関の靴の並べ替え",
+        "🥾 履いてない靴の1足処分", "👔 クローゼットの手前1着見直し", "🌀 脱衣所の床の髪の毛コロコロ", "🚪 玄関マットのパンパン埃叩き",
+        
+        // 水まわり・洗面所
+        "🪞 洗面台の鏡とまわり拭き", "🚰 洗面台の蛇口ピカピカ磨き", "🧼 お風呂の排水口のゴミポイッ", "🧻 トイレの便座ササッとひと拭き",
+        "🍽️ キッチンシンクの皿1個洗い", "💧 シンクまわりの水跳ね拭き取り", "🧽 使い古したスポンジの交換", "🧴 ハンドソープボトルの液だれ拭き",
+        
+        // キッチン・冷蔵庫
+        "🧊 冷蔵庫の賞味期限切れスカウト", "🥕 野菜室の傷みかけ野菜救出", "🧂 調味料ボトルのべたつき拭き", "🔥 コンロまわりの油跳ね1拭き",
+        "⚡ 電子レンジ内の飛び散り汚れ拭き", "🍚 炊飯器のまわりの米粒掃除", "🗑️ ゴミ箱の袋の交換", "🥢 余った割り箸・スプーンの間引き",
+        
+        // 趣味・ゲーム・推し活
+        "📚 本棚や棚の1段整理", "🎮 散らばったコントローラー・コード結束", "📖 漫画の背表紙のガタツキ揃え", "🗼 積ん読本の1箇所タワー化",
+        "✨ 推しアクスタ・フィギュアのホコリ払い", "📦 グッズの空き箱・外箱の解体", "🃏 トレカのバラけ整理", "🟡 趣味のガチャカプセルの即破棄",
+        
+        // その他・超イージー
+        "🗑️ 目の前のゴミ1個即拾い", "📮 ポストのチラシの直行ゴミ箱", "🎒 カバンの中のゴミ全捨て", "🛋️ クッションのポンポン形整え",
+        "🪟 カーテンを開けて空気の入れ替え", "🔑 ドアノブのアルコール除菌", "🧻 部屋の隅のホコリをティッシュでスッと", "🔍 鏡という鏡の指紋拭き"
+    ];
+    
+    function spinGacha() {
+        const randomIndex = Math.floor(Math.random() * places.length);
+        currentPlace = places[randomIndex];
+        document.getElementById('gacha-text').innerText = currentPlace;
+    }
+
+    let timerId = null;
+    let timeLeft = 180;
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+        const seconds = (timeLeft % 60).toString().padStart(2, '0');
+        document.getElementById('timer-text').innerText = `${minutes}:${seconds}`;
+    }
+
+    // 終了音を鳴らす関数（Web Audio API）
+    function playAlarmSound() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // ピピッ、と2回鳴らすためのスケジュール
+            [0, 0.15].forEach(delay => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine'; // やわらかめの音
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + delay); // 高めの音 (A5)
+                
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime + delay);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + 0.1);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(audioCtx.currentTime + delay);
+                osc.stop(audioCtx.currentTime + delay + 0.1);
+            });
+        } catch (e) {
+            console.log("音声の再生に失敗しました", e);
+        }
+    }
+
+    function toggleTimer() {
+        const btn = document.getElementById('timer-btn');
+        if (timerId === null) {
+            timerId = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    timerId = null;
+                    timeLeft = 180;
+                    updateTimerDisplay();
+                    btn.innerText = "タイマースタート";
+                    btn.classList.remove('stop');
+                    
+                    // 音を鳴らしてからアラートを表示
+                    playAlarmSound();
+                    alert("3分終了！えらい！天才！ここでやめてお茶にしましょう。");
+                }
+            }, 1000);
+            btn.innerText = "ストップ";
+            btn.classList.add('stop');
+        } else {
+            clearInterval(timerId);
+            timerId = null;
+            btn.innerText = "タイマースタート";
+            btn.classList.remove('stop');
+        }
+    }
+
+    let count = 0;
+    function countUp() {
+        count++;
+        document.getElementById('counter-text').innerText = count;
+    }
+
+    function shareToX() {
+        const text = `「ゆるお片づけ応援ツール」を使って、今日は【${currentPlace}】を片づけました！\n本日の手放し記録：${count}個 🧺✨\n\n今日も天才です！\n#1日1捨て #お片付け`;
+        const siteUrl = 'https://x.com';
+        const xUrl = `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(siteUrl)}`;
+        location.href = xUrl;
+    }
+</script>
+
+</body>
+</html>
