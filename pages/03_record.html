@@ -472,7 +472,7 @@
         <div class="section">
             <div class="label">💾 ふっかつのじゅもん</div>
             <div class="notice">
-                ブラウザを閉じても消えないように、毎日のきろくが自動で保存されます。
+                ブラウザを閉じても消えないように、ふっかつのじゅもんをご用意しました。
             </div>
             <div class="kotoba-box" id="todayKotoba">（きろくがまだありません）</div>
             <button class="copy-btn" id="copyBtn" type="button">📋 ふっかつのじゅもんをコピー</button>
@@ -558,9 +558,92 @@
 
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <script>
-    // ============ じゅもん生成・フォーマット ============
+// ============ じゅもん生成・フォーマット ============
     const BASE64_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     const HIRAGANA_SET = 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだぢづでどばびぶ';
+
+    const ODD_HIRAGANA = Array.from(HIRAGANA_SET).filter((_, i) => i % 2 === 0);
+    const EVEN_HIRAGANA = Array.from(HIRAGANA_SET).filter((_, i) => i % 2 !== 0);
+
+    function normalizeKotobaText(str) {
+        return (str || '').replace(/[\s\n]/g, '');
+    }
+
+    function calculateHash(str) {
+        let hash = 5381;
+        for (let i = 0; i < str.length; i++) {
+            hash = (hash * 33) ^ str.charCodeAt(i);
+        }
+        return Math.abs(hash >>> 0);
+    }
+
+    function getDeterministicChar(body, mode) {
+        const list = (mode === 'x') ? EVEN_HIRAGANA : ODD_HIRAGANA;
+        const index = calculateHash(body) % list.length;
+        return list[index];
+    }
+
+    function shiftHiragana(hiraganaStr, offset) {
+        const total = HIRAGANA_SET.length;
+        let result = '';
+        for (const char of hiraganaStr) {
+            const index = HIRAGANA_SET.indexOf(char);
+            if (index !== -1) {
+                result += HIRAGANA_SET[(index + offset) % total];
+            } else {
+                result += char;
+            }
+        }
+        return result;
+    }
+
+    function unshiftHiragana(hiraganaStr, offset) {
+        const total = HIRAGANA_SET.length;
+        let result = '';
+        for (const char of hiraganaStr) {
+            const index = HIRAGANA_SET.indexOf(char);
+            if (index !== -1) {
+                result += HIRAGANA_SET[(index - offset + total) % total];
+            } else {
+                result += char;
+            }
+        }
+        return result;
+    }
+
+    // 通常用データのみキー名を短縮化（配列の配列 [[date, cat, count, detail]]）
+    function packData(payload) {
+        if (Array.isArray(payload) && payload.length > 0 && typeof payload[0] === 'object' && !Array.isArray(payload[0])) {
+            return payload.map(r => [r.date, r.category, r.count, r.detail]);
+        }
+        return payload;
+    }
+
+    // 短縮された通常用配列データを元のオブジェクト配列に戻す
+    function unpackData(data) {
+        if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
+            return data.map(item => ({
+                date: item[0],
+                category: item[1],
+                count: item[2],
+                detail: item[3]
+            }));
+        }
+        return data;
+    }
+
+    function encodeMagicPayload(payload, mode = 'standard') {
+        const packed = packData(payload);
+        const json = JSON.stringify(packed);
+        const compressed = LZString.compressToBase64(json);
+        const body = base64ToHiragana(compressed);
+
+        const flagChar = getDeterministicChar(body, mode);
+        const offset = HIRAGANA_SET.indexOf(flagChar);
+        const shiftedBody = shiftHiragana(body, offset);
+
+        return formatKotoba(flagChar + shiftedBody);
+    }
 
     function base64ToHiragana(base64Str) {
         const cleaned = base64Str.replace(/=+$/, '');
@@ -589,18 +672,26 @@
     }
 
     function formatKotoba(hiraganaStr) {
+        const cleaned = normalizeKotobaText(hiraganaStr);
         const chunks = [];
-        for (let i = 0; i < hiraganaStr.length; i += 3) {
-            chunks.push(hiraganaStr.slice(i, i + 3));
+        for (let i = 0; i < cleaned.length; i += 3) {
+            chunks.push(cleaned.slice(i, i + 3));
         }
         return chunks.join(' ');
     }
 
     function decodeCompressedKotoba(str) {
-        const cleaned = (str || '').replace(/[\s\n]/g, '');
+        const cleaned = normalizeKotobaText(str);
         if (!cleaned) return null;
 
-        const base64 = hiraganaToBase64(cleaned);
+        const flagChar = cleaned.charAt(0);
+        const offset = HIRAGANA_SET.indexOf(flagChar);
+        if (offset === -1) return null;
+
+        const shiftedBody = cleaned.slice(1);
+        const originalBody = unshiftHiragana(shiftedBody, offset);
+
+        const base64 = hiraganaToBase64(originalBody);
         const json = LZString.decompressFromBase64(base64);
         if (!json) return null;
 
@@ -611,14 +702,15 @@
         }
     }
 
-    function summarizeByCategory(records) {
-        const counts = { '片づける': 0, '捨てる': 0, '整える': 0 };
-        records.forEach(record => {
-            if (counts[record.category] !== undefined) {
-                counts[record.category] += Number(record.count) || 0;
-            }
-        });
-        return counts;
+    function getKotobaType(kotobaStr) {
+        const cleaned = normalizeKotobaText(kotobaStr);
+        if (!cleaned) return 'unknown';
+
+        const firstChar = cleaned.charAt(0);
+        const index = HIRAGANA_SET.indexOf(firstChar);
+        if (index === -1) return 'unknown';
+
+        return (index % 2 === 0) ? 'standard' : 'x';
     }
 
     function summarizeTodayAndPrevious(records) {
@@ -629,9 +721,9 @@
             };
         }
 
-        const sortedRecords = [...records].sort((a, b) => new Date(a.date) - new Date(b.date));
-        const latestDate = new Date(sortedRecords[sortedRecords.length - 1].date);
-        const anchorStart = new Date(latestDate.getFullYear(), latestDate.getMonth(), latestDate.getDate());
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        
         const today = { '片づける': 0, '捨てる': 0, '整える': 0 };
         const previous = { '片づける': 0, '捨てる': 0, '整える': 0 };
 
@@ -641,13 +733,10 @@
             const category = record.category;
             const count = Number(record.count) || 0;
 
-            if (recordDayStart.getTime() === anchorStart.getTime()) {
+            if (recordDayStart.getTime() === todayStart.getTime()) {
                 if (today[category] !== undefined) today[category] += count;
-                return;
-            }
-
-            if (recordDate < anchorStart && previous[category] !== undefined) {
-                previous[category] += count;
+            } else if (recordDayStart.getTime() < todayStart.getTime()) {
+                if (previous[category] !== undefined) previous[category] += count;
             }
         });
 
@@ -656,10 +745,7 @@
 
     function generateKotoba(records) {
         if (!records || records.length === 0) return '';
-        const json = JSON.stringify(records);
-        const compressed = LZString.compressToBase64(json);
-        const hiragana = base64ToHiragana(compressed);
-        return formatKotoba(hiragana);
+        return encodeMagicPayload(records, 'standard');
     }
 
     function generateShareKotoba(records) {
@@ -667,16 +753,18 @@
 
         const { today, previous } = summarizeTodayAndPrevious(records);
         const categories = ['片づける', '捨てる', '整える'];
-        const payload = {
-            type: 'share-summary',
-            t: categories.map(category => Number(today[category]) || 0),
-            p: categories.map(category => Number(previous[category]) || 0)
-        };
+        
+        // 今日の記録・過去の記録のいずれも完全0件の場合のみ弾く
+        const totalCount = records.reduce((sum, r) => sum + (Number(r.count) || 0), 0);
+        if (totalCount === 0) return '';
 
-        const json = JSON.stringify(payload);
-        const compressed = LZString.compressToBase64(json);
-        const hiragana = base64ToHiragana(compressed);
-        return formatKotoba(hiragana);
+        const payload = [
+            Math.floor(Date.now() / 1000),
+            categories.map(c => Number(today[c]) || 0),
+            categories.map(c => Number(previous[c]) || 0)
+        ];
+
+        return encodeMagicPayload(payload, 'x');
     }
 
     function restoreKotoba(kotoba) {
@@ -684,15 +772,17 @@
             const decoded = decodeCompressedKotoba(kotoba);
             if (!decoded) throw new Error('Invalid kotoba');
 
-            if (Array.isArray(decoded)) {
-                return decoded;
+            // 通常版の復元
+            if (Array.isArray(decoded) && decoded.length > 0 && Array.isArray(decoded[0])) {
+                return unpackData(decoded);
             }
 
-            if (decoded.type === 'share-summary') {
+            // X版の復元
+            if (Array.isArray(decoded) && decoded.length === 3 && typeof decoded[0] === 'number') {
+                const [timestamp, todayCounts, previousCounts] = decoded;
                 const categories = ['片づける', '捨てる', '整える'];
-                const todayCounts = Array.isArray(decoded.t) ? decoded.t : [0, 0, 0];
-                const previousCounts = Array.isArray(decoded.p) ? decoded.p : [0, 0, 0];
-                const today = new Date();
+                
+                const today = new Date(timestamp * 1000);
                 const yesterday = new Date(today);
                 yesterday.setDate(today.getDate() - 1);
 
@@ -729,6 +819,21 @@
         }
     }
 
+    // X投稿用テキストの生成（テキストも最小限に整形）
+    function buildShareText() {
+        const records = loadRecords();
+        if (!records || records.length === 0) return null;
+
+        const { today, previous } = summarizeTodayAndPrevious(records);
+        const spell = generateShareKotoba(records);
+        if (!spell) return null;
+
+        const dateText = new Date().toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+        const todayTotal = today['片づける'] + today['捨てる'] + today['整える'];
+        const prevTotal = previous['片づける'] + previous['捨てる'] + previous['整える'];
+        
+        return `${dateText}お片づけのきろく\n片づけ${today['片づける']}・捨て${today['捨てる']}・整え${today['整える']}\n\nこれまで：\n片づけ${previous['片づける']}・捨て${previous['捨てる']}・整え${previous['整える']}\n\nふっかつのじゅもん：\n${spell}\nhttps://mememeatelier.github.io/`;
+    }
     // ============ データ管理 ============
     const STORAGE_KEY = 'cleanup_records';
 
@@ -787,35 +892,39 @@
     }
 
     function updateRecordsList(records) {
-        const list = document.getElementById('recordsList');
-        if (records.length === 0) {
-            list.innerHTML = '<div class="empty-state">きろくがまだありません</div>';
-            return;
-        }
+    const list = document.getElementById('recordsList');
+    if (records.length === 0) {
+        list.innerHTML = '<div class="empty-state">きろくがまだありません</div>';
+        return;
+    }
 
-        const sortedRecords = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
-        list.innerHTML = sortedRecords.map((record, index) => `
-            <div class="record-item">
-                <div class="record-info">
-                    <div class="record-date">${new Date(record.date).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', weekday: 'short' })}</div>
-                    <div class="record-text">${record.category} ${record.detail ? `「${record.detail}」` : ''}</div>
-                    <div class="record-count">+${record.count}こ</div>
-                </div>
-                <button class="record-delete" data-index="${index}" type="button">✕</button>
+    // 元の配列要素と元のインデックスを保持したままソートする
+    const sortedRecords = records
+        .map((record, originalIndex) => ({ record, originalIndex }))
+        .sort((a, b) => new Date(b.record.date) - new Date(a.record.date));
+
+    list.innerHTML = sortedRecords.map(({ record, originalIndex }) => `
+        <div class="record-item">
+            <div class="record-info">
+                <div class="record-date">${new Date(record.date).toLocaleDateString('ja-JP', { month: 'short', day: 'numeric', weekday: 'short' })}</div>
+                <div class="record-text">${record.category} ${record.detail ? `「${record.detail}」` : ''}</div>
+                <div class="record-count">+${record.count}こ</div>
             </div>
-        `).join('');
+            <button class="record-delete" data-index="${originalIndex}" type="button">✕</button>
+        </div>
+    `).join('');
 
-        document.querySelectorAll('.record-delete').forEach(btn => {
-            btn.addEventListener('click', () => deleteRecord(parseInt(btn.dataset.index)));
-        });
-    }
+    document.querySelectorAll('.record-delete').forEach(btn => {
+        btn.addEventListener('click', () => deleteRecord(parseInt(btn.dataset.index)));
+    });
+}
 
-    function deleteRecord(index) {
-        const records = loadRecords();
-        records.splice(index, 1);
-        saveRecords(records);
-        updateRecordDisplay();
-    }
+function deleteRecord(originalIndex) {
+    const records = loadRecords();
+    records.splice(originalIndex, 1);
+    saveRecords(records);
+    updateRecordDisplay();
+}
 
     // ============ タブ切り替え ============
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -889,21 +998,6 @@
             alert('コピーにしっぱいしました');
         });
     });
-
-    function buildShareText() {
-        const shortText = 'ふっかつのじゅもんをつくったよ！\nお片づけのきろくをみんなにシェアしよう。\nhttps://mememeatelier.github.io/';
-
-        const records = loadRecords();
-        if (!records || records.length === 0) {
-            return shortText;
-        }
-
-        const { today, previous } = summarizeTodayAndPrevious(records);
-        const spell = generateShareKotoba(records);
-        const summaryText = `お片づけのきろく 片づける${today['片づける']}・捨てる${today['捨てる']}・整える${today['整える']} / これまで 片づける${previous['片づける']}こ・捨てる${previous['捨てる']}こ・整える${previous['整える']}こ\n${spell}https://mememeatelier.github.io/`;
-
-        return summaryText.length <= 250 ? summaryText : `${shortText}\n${spell}`;
-    }
 
     document.getElementById('shareBtn').addEventListener('click', () => {
         const records = loadRecords();
