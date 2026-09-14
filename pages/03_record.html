@@ -832,7 +832,7 @@
         const todayTotal = today['片づける'] + today['捨てる'] + today['整える'];
         const prevTotal = previous['片づける'] + previous['捨てる'] + previous['整える'];
         
-        return `【${dateText}お片づけのきろく】\n片づけ${today['片づける']}・捨て${today['捨てる']}・整え${today['整える']}\n\n【これまで】\n片づけ${previous['片づける']}・捨て${previous['捨てる']}・整え${previous['整える']}\n\n【ふっかつのじゅもん】\n${spell}\nhttps://mememeatelier.github.io/`;
+        return `${dateText}ゆるお片づけのきろくをつけた！\n片づけ${today['片づける']}・捨て${today['捨てる']}・整え${today['整える']}\n\nこれまで\n片づけ${previous['片づける']}・捨て${previous['捨てる']}・整え${previous['整える']}\n\nふっかつのじゅもん\n${spell}\n#ゆるお片付け\nhttps://mememeatelier.github.io/`;
     }
     // ============ データ管理 ============
     const STORAGE_KEY = 'cleanup_records';
